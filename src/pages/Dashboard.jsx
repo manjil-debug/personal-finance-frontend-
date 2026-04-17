@@ -4,7 +4,12 @@ import { useBudgets } from '../hooks/useBudgets'
 import { formatCurrency, formatDate } from '../utils/format'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend,
 } from 'recharts'
+
+const DONUT_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#6366f1', '#14b8a6', '#f97316']
+
+const renderCustomLabel = ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`
 
 function SummaryCard({ title, amount, color }) {
   return (
@@ -146,6 +151,78 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Donut Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Budget Allocation Donut */}
+        {budgets.filter((b) => b.is_active).length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
+            <h3 className="text-sm font-medium text-gray-700 mb-4">Budget Allocation</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={(() => {
+                    const activeBudgets = budgets.filter((b) => b.is_active)
+                    const totalBudget = activeBudgets.reduce((sum, b) => sum + parseFloat(b.amount || 0), 0)
+                    return activeBudgets.map((b) => ({
+                      name: b.name,
+                      value: parseFloat(b.amount),
+                      pct: totalBudget > 0 ? ((parseFloat(b.amount) / totalBudget) * 100).toFixed(1) : 0,
+                    }))
+                  })()}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={65}
+                  outerRadius={100}
+                  paddingAngle={3}
+                  dataKey="value"
+                  label={renderCustomLabel}
+                >
+                  {budgets.filter((b) => b.is_active).map((_, i) => (
+                    <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => formatCurrency(value)} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Net Worth by Account Donut */}
+        {accounts.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
+            <h3 className="text-sm font-medium text-gray-700 mb-4">Net Worth by Account</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={accounts
+                    .filter((a) => parseFloat(a.balance || 0) > 0)
+                    .map((a) => ({
+                      name: a.name,
+                      value: parseFloat(a.balance),
+                    }))}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={65}
+                  outerRadius={100}
+                  paddingAngle={3}
+                  dataKey="value"
+                  label={renderCustomLabel}
+                >
+                  {accounts
+                    .filter((a) => parseFloat(a.balance || 0) > 0)
+                    .map((a, i) => (
+                      <Cell key={i} fill={a.color || DONUT_COLORS[i % DONUT_COLORS.length]} />
+                    ))}
+                </Pie>
+                <Tooltip formatter={(value) => formatCurrency(value)} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
     </div>
   )
