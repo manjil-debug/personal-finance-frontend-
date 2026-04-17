@@ -1,8 +1,10 @@
-export function formatCurrency(amount, currency = 'USD') {
+export function formatCurrency(amount, currency = 'NPR') {
   const num = parseFloat(amount) || 0
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-NP', {
     style: 'currency',
     currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(num)
 }
 

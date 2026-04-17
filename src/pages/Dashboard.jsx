@@ -4,16 +4,13 @@ import { useBudgets } from '../hooks/useBudgets'
 import { formatCurrency, formatDate } from '../utils/format'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend,
 } from 'recharts'
-
-const PIE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#6366f1', '#14b8a6', '#f97316']
 
 function SummaryCard({ title, amount, color }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
-      <p className="text-sm text-gray-500 mb-1">{title}</p>
-      <p className={`text-2xl font-bold ${color}`}>{formatCurrency(amount)}</p>
+    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
+      <p className="text-xs sm:text-sm text-gray-500 mb-1">{title}</p>
+      <p className={`text-lg sm:text-2xl font-bold ${color}`}>{formatCurrency(amount)}</p>
     </div>
   )
 }
@@ -53,7 +50,7 @@ export default function Dashboard() {
   if (loadingAccounts || loadingTxns) {
     return (
       <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="bg-white rounded-xl border border-gray-200 p-5 animate-pulse">
               <div className="h-4 bg-gray-200 rounded w-20 mb-2"></div>
@@ -68,120 +65,15 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <SummaryCard title="Net Worth" amount={netWorth} color="text-gray-900" />
         <SummaryCard title="Total Income" amount={totalIncome} color="text-green-600" />
         <SummaryCard title="Total Expenses" amount={totalExpenses} color="text-red-600" />
       </div>
 
-      {/* Charts & Lists */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Spending Trend */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <h3 className="text-sm font-medium text-gray-700 mb-4">Spending Trend (Last 7 Days)</h3>
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={spendingData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#94a3b8" />
-              <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" />
-              <Tooltip />
-              <Line type="monotone" dataKey="amount" stroke="#3b82f6" strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Recent Transactions */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <h3 className="text-sm font-medium text-gray-700 mb-4">Recent Transactions</h3>
-          {recentTransactions.length === 0 ? (
-            <p className="text-gray-400 text-sm">No transactions yet</p>
-          ) : (
-            <div className="space-y-3">
-              {recentTransactions.map((txn) => (
-                <div key={txn.id} className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-800">{txn.description}</p>
-                    <p className="text-xs text-gray-400">{formatDate(txn.date)}</p>
-                  </div>
-                  <span
-                    className={`text-sm font-semibold ${
-                      txn.type === 'income' ? 'text-green-600' : 'text-red-600'
-                    }`}
-                  >
-                    {txn.type === 'income' ? '+' : '-'}{formatCurrency(txn.amount)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Budget Pie Charts */}
-      {budgets.filter((b) => b.is_active).length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Budget Allocation Pie */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h3 className="text-sm font-medium text-gray-700 mb-4">Budget Allocation</h3>
-            <ResponsiveContainer width="100%" height={280}>
-              <PieChart>
-                <Pie
-                  data={budgets.filter((b) => b.is_active).map((b) => ({
-                    name: b.name,
-                    value: parseFloat(b.amount),
-                  }))}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {budgets.filter((b) => b.is_active).map((_, i) => (
-                    <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => formatCurrency(value)} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Budget Spent vs Remaining Pie */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h3 className="text-sm font-medium text-gray-700 mb-4">Spent vs Remaining</h3>
-            <ResponsiveContainer width="100%" height={280}>
-              <PieChart>
-                <Pie
-                  data={budgets.filter((b) => b.is_active).map((b) => {
-                    const spent = transactions
-                      .filter((t) => t.type === 'expense' && t.category_id === b.category_id)
-                      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0)
-                    const remaining = Math.max(parseFloat(b.amount) - spent, 0)
-                    return { name: b.name, spent, remaining }
-                  })}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={3}
-                  dataKey="spent"
-                >
-                  {budgets.filter((b) => b.is_active).map((_, i) => (
-                    <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => formatCurrency(value)} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      )}
-
-      {/* Budget Progress */}
+      {/* Budget Overview - moved to top */}
       {budgets.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
           <h3 className="text-sm font-medium text-gray-700 mb-4">Budget Overview</h3>
           <div className="space-y-4">
             {budgets.filter((b) => b.is_active).slice(0, 5).map((budget) => {
@@ -212,6 +104,49 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Charts & Lists */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Spending Trend */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
+          <h3 className="text-sm font-medium text-gray-700 mb-4">Spending Trend (Last 7 Days)</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={spendingData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#94a3b8" />
+              <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" />
+              <Tooltip />
+              <Line type="monotone" dataKey="amount" stroke="#3b82f6" strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Recent Transactions */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
+          <h3 className="text-sm font-medium text-gray-700 mb-4">Recent Transactions</h3>
+          {recentTransactions.length === 0 ? (
+            <p className="text-gray-400 text-sm">No transactions yet</p>
+          ) : (
+            <div className="space-y-3">
+              {recentTransactions.map((txn) => (
+                <div key={txn.id} className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">{txn.description}</p>
+                    <p className="text-xs text-gray-400">{formatDate(txn.date)}</p>
+                  </div>
+                  <span
+                    className={`text-sm font-semibold ${
+                      txn.type === 'income' ? 'text-green-600' : 'text-red-600'
+                    }`}
+                  >
+                    {txn.type === 'income' ? '+' : '-'}{formatCurrency(txn.amount)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
