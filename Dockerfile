@@ -2,7 +2,7 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-ARG VITE_API_URL=http://api:8000/api/v1
+ARG VITE_API_URL=/api/v1
 
 COPY package.json package-lock.json* ./
 RUN npm ci

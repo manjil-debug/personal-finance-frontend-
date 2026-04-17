@@ -5,7 +5,7 @@ services:
     build:
       context: .
       args:
-        VITE_API_URL: http://api:8000/api/v1
+        VITE_API_URL: /api/v1
     container_name: finance_frontend
     restart: unless-stopped
     ports:
