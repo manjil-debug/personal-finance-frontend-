@@ -4,7 +4,10 @@ import { useBudgets } from '../hooks/useBudgets'
 import { formatCurrency, formatDate } from '../utils/format'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend,
 } from 'recharts'
+
+const PIE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#6366f1', '#14b8a6', '#f97316']
 
 function SummaryCard({ title, amount, color }) {
   return (
@@ -113,6 +116,68 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* Budget Pie Charts */}
+      {budgets.filter((b) => b.is_active).length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Budget Allocation Pie */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <h3 className="text-sm font-medium text-gray-700 mb-4">Budget Allocation</h3>
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={budgets.filter((b) => b.is_active).map((b) => ({
+                    name: b.name,
+                    value: parseFloat(b.amount),
+                  }))}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={3}
+                  dataKey="value"
+                >
+                  {budgets.filter((b) => b.is_active).map((_, i) => (
+                    <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => formatCurrency(value)} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Budget Spent vs Remaining Pie */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <h3 className="text-sm font-medium text-gray-700 mb-4">Spent vs Remaining</h3>
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={budgets.filter((b) => b.is_active).map((b) => {
+                    const spent = transactions
+                      .filter((t) => t.type === 'expense' && t.category_id === b.category_id)
+                      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0)
+                    const remaining = Math.max(parseFloat(b.amount) - spent, 0)
+                    return { name: b.name, spent, remaining }
+                  })}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={3}
+                  dataKey="spent"
+                >
+                  {budgets.filter((b) => b.is_active).map((_, i) => (
+                    <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => formatCurrency(value)} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
 
       {/* Budget Progress */}
       {budgets.length > 0 && (
