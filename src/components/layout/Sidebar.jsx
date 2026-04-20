@@ -30,7 +30,7 @@ export default function Sidebar({ open, onClose }) {
       )}
 
       <aside
-        className={`fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 flex flex-col z-50 transition-transform duration-300 ${
+        className={`fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col z-50 transition-transform duration-300 ${
           open ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0 lg:z-30`}
       >
@@ -38,7 +38,7 @@ export default function Sidebar({ open, onClose }) {
           <h1 className="text-xl font-bold text-primary-600">FinanceApp</h1>
           <button
             onClick={onClose}
-            className="lg:hidden p-1 text-gray-400 hover:text-gray-600"
+            className="lg:hidden p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
           >
             <HiXMark className="w-5 h-5" />
           </button>
@@ -54,8 +54,8 @@ export default function Sidebar({ open, onClose }) {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-primary-50 text-primary-700'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200'
                 }`
               }
             >

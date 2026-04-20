@@ -29,29 +29,29 @@ export default function Settings() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h2 className="text-xl font-bold text-gray-800">Settings</h2>
+      <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Settings</h2>
 
       {/* Profile */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="text-sm font-medium text-gray-700 mb-4">Profile</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Profile</h3>
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center text-2xl font-bold text-primary-700">
+          <div className="w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-2xl font-bold text-primary-700 dark:text-primary-300">
             {user?.full_name?.[0]?.toUpperCase() || 'U'}
           </div>
           <div>
-            <p className="font-semibold text-gray-800">{user?.full_name}</p>
-            <p className="text-sm text-gray-500">{user?.email}</p>
+            <p className="font-semibold text-gray-800 dark:text-gray-100">{user?.full_name}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</p>
           </div>
         </div>
 
         <form onSubmit={handleUpdateProfile} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
             <input
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 dark:text-gray-100"
             />
           </div>
           <button
@@ -65,17 +65,17 @@ export default function Settings() {
       </div>
 
       {/* Categories */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="text-sm font-medium text-gray-700 mb-4">Categories</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Categories</h3>
 
         {expenseCategories.length > 0 && (
           <div className="mb-4">
-            <p className="text-xs font-medium text-gray-500 uppercase mb-2">Expense</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">Expense</p>
             <div className="flex flex-wrap gap-2">
               {expenseCategories.map((c) => (
                 <span
                   key={c.id}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-700 rounded-full text-xs font-medium"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full text-xs font-medium"
                 >
                   {c.icon} {c.name}
                 </span>
@@ -86,12 +86,12 @@ export default function Settings() {
 
         {incomeCategories.length > 0 && (
           <div>
-            <p className="text-xs font-medium text-gray-500 uppercase mb-2">Income</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">Income</p>
             <div className="flex flex-wrap gap-2">
               {incomeCategories.map((c) => (
                 <span
                   key={c.id}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-xs font-medium"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-medium"
                 >
                   {c.icon} {c.name}
                 </span>
@@ -104,7 +104,7 @@ export default function Settings() {
       {/* Logout */}
       <button
         onClick={logout}
-        className="px-4 py-2 border border-red-300 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors"
+        className="px-4 py-2 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 rounded-lg text-sm font-medium hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
       >
         Log Out
       </button>

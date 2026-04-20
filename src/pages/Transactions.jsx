@@ -47,10 +47,10 @@ function TransactionForm({ transaction, accounts, categories, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">{transaction ? 'Edit Transaction' : 'New Transaction'}</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <h3 className="text-lg font-semibold dark:text-gray-100">{transaction ? 'Edit Transaction' : 'New Transaction'}</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
             <HiXMark className="w-5 h-5" />
           </button>
         </div>
@@ -59,12 +59,12 @@ function TransactionForm({ transaction, accounts, categories, onClose }) {
           {!transaction && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Account</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Account</label>
                 <select
                   value={accountId}
                   onChange={(e) => setAccountId(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 dark:text-gray-100"
                 >
                   <option value="">Select account</option>
                   {accounts.map((a) => (
@@ -76,7 +76,7 @@ function TransactionForm({ transaction, accounts, categories, onClose }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
                 <div className="flex gap-2">
                   {['expense', 'income'].map((t) => (
                     <button
@@ -86,9 +86,9 @@ function TransactionForm({ transaction, accounts, categories, onClose }) {
                       className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${
                         type === t
                           ? t === 'expense'
-                            ? 'bg-red-50 border-red-300 text-red-700'
-                            : 'bg-green-50 border-green-300 text-green-700'
-                          : 'border-gray-200 text-gray-500'
+                            ? 'bg-red-50 dark:bg-red-900/30 border-red-300 dark:border-red-700 text-red-700 dark:text-red-400'
+                            : 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-700 text-green-700 dark:text-green-400'
+                          : 'border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400'
                       }`}
                     >
                       {t === 'expense' ? 'Expense' : 'Income'}
@@ -98,7 +98,7 @@ function TransactionForm({ transaction, accounts, categories, onClose }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount</label>
                 <input
                   type="number"
                   step="0.01"
@@ -106,18 +106,18 @@ function TransactionForm({ transaction, accounts, categories, onClose }) {
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 dark:text-gray-100"
                 />
               </div>
             </>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 dark:text-gray-100"
             >
               <option value="">No category</option>
               {categories
@@ -131,34 +131,34 @@ function TransactionForm({ transaction, accounts, categories, onClose }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 dark:text-gray-100"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 dark:text-gray-100 resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 dark:text-gray-100"
             />
           </div>
 
@@ -203,9 +203,9 @@ export default function Transactions() {
     return (
       <div className="space-y-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="bg-white rounded-xl border border-gray-200 p-4 animate-pulse">
-            <div className="h-5 bg-gray-200 rounded w-48 mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-32"></div>
+          <div key={i} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 animate-pulse">
+            <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
           </div>
         ))}
       </div>
@@ -215,7 +215,7 @@ export default function Transactions() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-gray-800">Transactions</h2>
+        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Transactions</h2>
         <button
           onClick={() => { setEditTxn(null); setShowForm(true) }}
           className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
@@ -230,7 +230,7 @@ export default function Transactions() {
         <select
           value={filterAccount}
           onChange={(e) => setFilterAccount(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+          className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 dark:text-gray-100"
         >
           <option value="">All Accounts</option>
           {accounts.map((a) => (
@@ -242,26 +242,26 @@ export default function Transactions() {
       </div>
 
       {sortedTxns.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <p className="text-gray-500">No transactions found</p>
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
+          <p className="text-gray-500 dark:text-gray-400">No transactions found</p>
         </div>
       ) : (
         <div className="space-y-4">
           {Object.entries(grouped).map(([date, txns]) => (
             <div key={date}>
-              <h4 className="text-sm font-medium text-gray-500 mb-2">{formatDate(date)}</h4>
-              <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+              <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">{formatDate(date)}</h4>
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
                 {txns.map((txn) => {
                   const category = categoryMap[txn.category_id]
                   const account = accountMap[txn.account_id]
                   return (
                     <div key={txn.id} className="flex items-center justify-between p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center text-sm">
+                        <div className="w-9 h-9 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center justify-center text-sm">
                           {category?.icon || (txn.type === 'income' ? '💰' : '💸')}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-800">{txn.description}</p>
+                          <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{txn.description}</p>
                           <p className="text-xs text-gray-400">
                             {account?.name || 'Unknown'}{category ? ` · ${category.name}` : ''}
                           </p>
@@ -270,7 +270,7 @@ export default function Transactions() {
                       <div className="flex items-center gap-3">
                         <span
                           className={`text-sm font-semibold ${
-                            txn.type === 'income' ? 'text-green-600' : 'text-red-600'
+                            txn.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                           }`}
                         >
                           {txn.type === 'income' ? '+' : '-'}{formatCurrency(txn.amount)}
