@@ -1,11 +1,12 @@
 import { useAccounts } from '../hooks/useAccounts'
 import { useTransactions } from '../hooks/useTransactions'
 import { useBudgets } from '../hooks/useBudgets'
+import { useCategories } from '../hooks/useCategories'
 import { useTheme } from '../context/ThemeContext'
 import { formatCurrency, formatDate } from '../utils/format'
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell,
+  PieChart, Pie, Cell, BarChart, Bar, Legend, LineChart, Line,
 } from 'recharts'
 
 const DONUT_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#6366f1', '#14b8a6', '#f97316']
@@ -48,6 +49,7 @@ export default function Dashboard() {
   const { data: accounts = [], isLoading: loadingAccounts } = useAccounts()
   const { data: transactions = [], isLoading: loadingTxns } = useTransactions()
   const { data: budgets = [] } = useBudgets()
+  const { data: categories = [] } = useCategories()
   const { theme } = useTheme()
   const isDark = theme === 'dark'
 
@@ -77,6 +79,47 @@ export default function Dashboard() {
       amount: dayExpenses,
     })
   }
+
+  // Build monthly income vs expenses data (last 6 months)
+  const categoryMap = categories.reduce((map, c) => ({ ...map, [c.id]: c }), {})
+  const monthlyData = []
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(1)
+    d.setMonth(d.getMonth() - i)
+    const year = d.getFullYear()
+    const month = d.getMonth()
+    const label = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
+    const monthIncome = transactions
+      .filter((t) => {
+        const td = new Date(t.date)
+        return t.type === 'income' && td.getFullYear() === year && td.getMonth() === month
+      })
+      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0)
+    const monthExpense = transactions
+      .filter((t) => {
+        const td = new Date(t.date)
+        return t.type === 'expense' && td.getFullYear() === year && td.getMonth() === month
+      })
+      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0)
+    monthlyData.push({ month: label, income: monthIncome, expenses: monthExpense, net: monthIncome - monthExpense })
+  }
+
+  // Build expense breakdown by category
+  const expenseByCategory = {}
+  transactions
+    .filter((t) => t.type === 'expense')
+    .forEach((t) => {
+      const cat = categoryMap[t.category_id]
+      const name = cat ? cat.name : 'Uncategorized'
+      expenseByCategory[name] = (expenseByCategory[name] || 0) + parseFloat(t.amount || 0)
+    })
+  const expenseCategoryData = Object.entries(expenseByCategory)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value)
+
+  // Top 5 spending categories for horizontal bar
+  const topCategories = expenseCategoryData.slice(0, 5)
 
   if (loadingAccounts || loadingTxns) {
     return (
@@ -282,6 +325,135 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* Income vs Expenses & Cash Flow */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Monthly Income vs Expenses */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-5">
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Income vs Expenses (Last 6 Months)</h3>
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={monthlyData} barGap={4}>
+              <XAxis
+                dataKey="month"
+                tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#64748b' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#64748b' }}
+                axisLine={false}
+                tickLine={false}
+                width={50}
+              />
+              <Tooltip content={<CustomTooltip formatter={(v) => formatCurrency(v)} />} />
+              <Legend
+                wrapperStyle={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}
+              />
+              <Bar dataKey="income" name="Income" fill="#10b981" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="expenses" name="Expenses" fill="#ef4444" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Monthly Cash Flow Trend */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-5">
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Net Cash Flow (Last 6 Months)</h3>
+          <ResponsiveContainer width="100%" height={240}>
+            <LineChart data={monthlyData}>
+              <XAxis
+                dataKey="month"
+                tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#64748b' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#64748b' }}
+                axisLine={false}
+                tickLine={false}
+                width={50}
+              />
+              <Tooltip content={<CustomTooltip formatter={(v) => formatCurrency(v)} />} />
+              <Line
+                type="monotone"
+                dataKey="net"
+                name="Net"
+                stroke="#8b5cf6"
+                strokeWidth={2}
+                dot={{ r: 4, fill: '#8b5cf6', strokeWidth: 0 }}
+                activeDot={{ r: 6 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Expense by Category & Top Categories */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Expense Breakdown by Category Donut */}
+        {expenseCategoryData.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-5">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Expenses by Category</h3>
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie
+                  data={expenseCategoryData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={100}
+                  paddingAngle={3}
+                  dataKey="value"
+                  stroke="none"
+                >
+                  {expenseCategoryData.map((_, i) => (
+                    <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip content={<PieTooltip formatter={(v) => formatCurrency(v)} />} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 justify-center mt-2">
+              {expenseCategoryData.map((entry, i) => (
+                <div key={entry.name} className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: DONUT_COLORS[i % DONUT_COLORS.length] }} />
+                  {entry.name}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Top 5 Spending Categories Bar */}
+        {topCategories.length > 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-5">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Top Spending Categories</h3>
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={topCategories} layout="vertical" barSize={18}>
+                <XAxis
+                  type="number"
+                  tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#64748b' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#64748b' }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={100}
+                />
+                <Tooltip content={<CustomTooltip formatter={(v) => formatCurrency(v)} />} />
+                <Bar dataKey="value" name="Spent" radius={[0, 4, 4, 0]}>
+                  {topCategories.map((_, i) => (
+                    <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         )}
       </div>

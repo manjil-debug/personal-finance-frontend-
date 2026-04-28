@@ -36,6 +36,7 @@ export function useUpdateTransaction() {
     mutationFn: ({ id, data }) => transactionsApi.update(id, data).then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['accounts'] })
       toast.success('Transaction updated')
     },
     onError: (err) => toast.error(err.response?.data?.detail || 'Failed to update transaction'),
