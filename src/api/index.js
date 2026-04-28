@@ -47,3 +47,7 @@ export const budgetsApi = {
 export const categoriesApi = {
   list: () => client.get('/categories'),
 }
+
+export const dashboardApi = {
+  get: () => client.get('/dashboard'),
+}
